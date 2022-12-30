@@ -1,27 +1,47 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"os"
+	"time"
 
 	"github.com/ejuju/go-logs"
 )
 
 func main() {
-	logger, err := logs.NewJSONLogger("./your_log_dir")
+	// Create log file
+	f, err := os.Create(fmt.Sprintf("logs.%d.txt", time.Now().Unix()))
 	if err != nil {
 		panic(err)
 	}
 
-	// Log a simple message
-	_ = logger.Log(logs.New(logs.LevelInfo, "hey, i'm a log"))
+	// Configure logging
+	config := &logs.Config{
+		Writers:    []io.Writer{f, os.Stdout}, // write to file and stdout
+		Serializer: logs.AsJSON,               // serialize as JSON
+		LogSuffix:  ",\n",                     // append comma and line break to each log
+		BaseOptions: []logs.LogOption{
+			logs.WithTimestamp(), // store timestamp in logs
+			logs.WithSrc(),       // store source code location in logs
+		},
+	}
 
-	// Log a message with additional data
-	_ = logger.Log(logs.New(
-		logs.LevelError,                         // Defines the log severity level
-		"i'm the log message",                   // Defines the log message
-		logs.WithSourceCodeLocation("src", 0),   // Adds source code location in the log
-		logs.WithFS("fs", os.DirFS(".")),        // Adds info about a file system in the log
-		logs.WithData("more_data", "some data"), // Adds some more data to the log
-		logs.WithData("again", os.Args),         // Accepts any type that can be serialized.
+	// Get logging func
+	log, err := config.LoggerFunc()
+	if err != nil {
+		panic(err)
+	}
+
+	// Write a simple log
+	log(logs.NewLog("hey, i'm a log"))
+
+	// Write a log with additional data
+	log(logs.NewLog(
+		"hey, i'm another log",
+		logs.WithLevel(logs.LevelInfo.String()),
+		logs.WithFSys(os.DirFS(".")),
+		logs.WithData("some_key", "some data"),
+		logs.WithData("other_key", os.Args),
 	))
 }

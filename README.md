@@ -2,11 +2,10 @@
 
 Features:
 
--   [x] Simple logging with level and message
--   [x] Structured logging (using JSON)
--   [x] Log to file
--   [x] Support arbitrary extra log data (source code location, file-system, etc.)
--   [ ] Support logging to multiple writers (ex: terminal + file)
+-   [x] Create logs (with timestamp, level, message, location in source code and optional data)
+-   [x] Serialize structured logs (as JSON, single-line text)
+-   [x] Write logs to io.Writer easily (including to multiple writers, ex: terminal + file)
+-   [x] Use common log levels (info, warning, error, etc.)
 
 Todo:
 
