@@ -101,9 +101,9 @@ func WithFSys(fsys fs.FS) LogOption {
 // Serializer can convert a Log to bytes so that it can be written.
 type Serializer func(*Log) []byte
 
-// Returns the JSON representation of a log.
+// Returns the JSON representation of a log with line breaks and indentations.
 // This function will panic if the JSON marshalling of the log returns an error.
-func AsJSON(l *Log) []byte {
+func AsPrettyJSON(l *Log) []byte {
 	b, err := json.MarshalIndent(l, "", "\t")
 	if err != nil {
 		panic(err)
@@ -111,9 +111,23 @@ func AsJSON(l *Log) []byte {
 	return b
 }
 
-// Returns a single line text representation of a log.
-func AsSingleLine(l *Log) []byte {
-	return []byte(fmt.Sprintf("%q %#v", l.Message, l.Data))
+// Returns a single-line-JSON representation of a log.
+// This function will panic if the JSON marshalling of the log returns an error.
+func AsJSON(l *Log) []byte {
+	b, err := json.Marshal(l)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+// Returns a single-line textual representation of a log.
+func AsPlainText(l *Log) []byte {
+	out := l.Message
+	for k, v := range l.Data {
+		out += fmt.Sprintf(", %s: %v", k, v)
+	}
+	return []byte(out)
 }
 
 // LogLevel represents the severity of a log.

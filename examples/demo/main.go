@@ -18,7 +18,7 @@ func main() {
 
 	// Configure default logger
 	config := &logs.DefaultLogger{
-		Writers:    []io.Writer{f, os.Stdout}, // write to file and stdout
+		Writers:    []io.Writer{f, os.Stdout}, // write to both file and stdout
 		Serializer: logs.AsJSON,               // serialize as JSON
 		LogSuffix:  ",",                       // append comma to each log
 		BaseOptions: []logs.LogOption{
