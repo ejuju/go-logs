@@ -8,7 +8,7 @@ import (
 
 type LoggerFunc func(*Log) error
 
-type Config struct {
+type DefaultLogger struct {
 	Writers     []io.Writer // For ex: stdout and/or file
 	Serializer  Serializer  // For ex: As JSON
 	BaseOptions []LogOption // For ex: creation timestamp, source code location
@@ -16,9 +16,9 @@ type Config struct {
 	LogSuffix   string      // For ex: ",\n" to seperate JSON logs by commas and line breaks
 }
 
-func (c *Config) LoggerFunc() (LoggerFunc, error) {
+func (dl *DefaultLogger) LoggerFunc() (LoggerFunc, error) {
 	// Init writer with stdout and logfile
-	w := newWriterWrapper(c.Writers...)
+	w := newWriterWrapper(dl.Writers...)
 
 	// Init mutex
 	mu := &sync.Mutex{}
@@ -28,15 +28,15 @@ func (c *Config) LoggerFunc() (LoggerFunc, error) {
 		defer mu.Unlock()
 
 		// Apply base options to log
-		for _, opt := range c.BaseOptions {
+		for _, opt := range dl.BaseOptions {
 			opt(l)
 		}
 
 		// Get log bytes
 		b := bytes.Join([][]byte{
-			[]byte(c.LogPrefix),
-			c.Serializer(l),
-			[]byte(c.LogSuffix),
+			[]byte(dl.LogPrefix),
+			dl.Serializer(l),
+			[]byte(dl.LogSuffix + "\n"),
 		}, nil)
 
 		// Write log

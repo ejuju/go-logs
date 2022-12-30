@@ -1,6 +1,9 @@
 package logs
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // Serializer can convert a Log to bytes so that it can be written.
 type Serializer func(*Log) []byte
@@ -13,4 +16,9 @@ func AsJSON(l *Log) []byte {
 		panic(err)
 	}
 	return b
+}
+
+// Returns a single line text representation of a log.
+func AsSingleLine(l *Log) []byte {
+	return []byte(fmt.Sprintf("%q %#v", l.Message, l.Data))
 }

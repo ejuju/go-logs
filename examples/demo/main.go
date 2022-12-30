@@ -16,11 +16,11 @@ func main() {
 		panic(err)
 	}
 
-	// Configure logging
-	config := &logs.Config{
+	// Configure default logger
+	config := &logs.DefaultLogger{
 		Writers:    []io.Writer{f, os.Stdout}, // write to file and stdout
 		Serializer: logs.AsJSON,               // serialize as JSON
-		LogSuffix:  ",\n",                     // append comma and line break to each log
+		LogSuffix:  ",",                       // append comma to each log
 		BaseOptions: []logs.LogOption{
 			logs.WithTimestamp(), // store timestamp in logs
 			logs.WithSrc(),       // store source code location in logs
